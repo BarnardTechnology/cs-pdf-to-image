@@ -11,6 +11,11 @@ namespace cs_pdf_to_image
 {
     public class Pdf2Image
     {
+        public enum OutputFormat
+        {
+            pngmono, png16, png256, pnggray, png16m
+        }
+
         private static string mGSPath = null;
         public static string GSPath
         {
@@ -58,7 +63,7 @@ namespace cs_pdf_to_image
             return app_root + "\\" + relative_path;
         }
 
-        public static List<string> Convert(string filename, string img_filename)
+        public static List<string> Convert(string filename, string img_filename, OutputFormat output_format, int resolution = 300)
         {
             string error = null;
             List<string> errors = new List<string>();
@@ -73,7 +78,6 @@ namespace cs_pdf_to_image
             {
                 File.Delete(img_filename);
             }
-
 
             //This is the object that perform the real conversion!
             PDFConvert converter = new PDFConvert();
@@ -90,11 +94,13 @@ namespace cs_pdf_to_image
 
             converter.FitPage = true;
             converter.JPEGQuality = mPrintQuality; //80
-            converter.OutputFormat = "png256";
+            converter.OutputFormat = output_format.ToString();
 
             converter.OutputToMultipleFile = false;
             converter.FirstPageToConvert = -1;
             converter.LastPageToConvert = -1;
+
+            converter.ResolutionX = converter.ResolutionY = resolution;
 
             System.IO.FileInfo input = new FileInfo(filename);
             if (!string.IsNullOrEmpty(mGSPath))
